@@ -17,7 +17,6 @@ class Catalogue extends StatefulWidget {
 class _CatalogueState extends State<Catalogue> {
   //Global page vars
   final searchController = TextEditingController();
-  String temp = 'Wyszukiwanie';
 
   List<Product> expandedIndexes = [];
   List<Product> expandedContentControl = [];
@@ -69,9 +68,6 @@ class _CatalogueState extends State<Catalogue> {
           CatalogueSearchBar(
             searchController: searchController,
             querySearchCallback: (query) async {
-              setState(() {
-                temp = query;
-              });
               await Provider.of<ProductDatabase>(
                 context,
                 listen: false,
@@ -79,7 +75,6 @@ class _CatalogueState extends State<Catalogue> {
             },
           ),
           SizedBox(height: 10),
-          Text(temp),
           Consumer<ProductDatabase>(
             builder: (context, db, child) {
               return Padding(
