@@ -10,10 +10,14 @@ import 'package:ak_warehouse/theme/app_theme.dart';
 import 'package:ak_warehouse/widgets/main_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:window_size/window_size.dart';
 
 void main() async {
   await IsarService().openIsar();
   WidgetsFlutterBinding.ensureInitialized();
+
+  setWindowTitle('KEYBOARDWAY MAGAZYN');
+  setWindowMinSize(Size(640, 720));
   runApp(
     ChangeNotifierProvider<ProductDatabase>(
       create: (_) => ProductDatabase(),
