@@ -74,30 +74,44 @@ class ProductDatabase extends ChangeNotifier {
       searchedProducts.addAll(products);
       notifyListeners();
     } else {
+      final List<String> words = query.split(' ');
       final products =
           await isarService.isar.products
               .filter()
               .group(
                 (q) => q
-                    .nameContains(query, caseSensitive: false)
+                    // Check if any word from the list is in the Product's fields
+                    .anyOf(
+                      words,
+                      (wordQ, word) => wordQ.group(
+                        (innerQ) => innerQ
+                            .nameContains(word, caseSensitive: false)
+                            .or()
+                            .descriptionContains(word, caseSensitive: false)
+                            .or()
+                            .modelContains(word, caseSensitive: false),
+                      ),
+                    )
                     .or()
-                    .descriptionContains(query, caseSensitive: false)
-                    .or()
-                    .modelContains(query, caseSensitive: false)
-                    .or()
+                    // Check if any word from the list is in any Compatible object's producer or model
                     .compatibleListElement(
-                      (comp) => comp
-                          .modelContains(query, caseSensitive: false)
-                          .or()
-                          .producerContains(query, caseSensitive: false),
+                      (compQ) => compQ.anyOf(
+                        words,
+                        (wordQ, word) => wordQ.group(
+                          (innerQ) => innerQ
+                              .producerContains(word, caseSensitive: false)
+                              .or()
+                              .modelContains(word, caseSensitive: false),
+                        ),
+                      ),
                     ),
               )
               .findAll();
       debugPrint('[ISAR] Found ${products.length} products by query search!');
-      products.sort((a, b) => a.count.compareTo(b.count));
       searchedProducts.clear();
       searchedProducts.addAll(products);
     }
+    searchedProducts.sort((a, b) => a.count.compareTo(b.count));
     notifyListeners();
   }
 
