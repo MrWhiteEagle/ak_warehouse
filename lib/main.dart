@@ -17,7 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   setWindowTitle('KEYBOARDWAY MAGAZYN');
-  setWindowMinSize(Size(640, 720));
+  setWindowMinSize(Size(720, 1000));
   runApp(
     ChangeNotifierProvider<ProductDatabase>(
       create: (_) => ProductDatabase(),
