@@ -39,7 +39,7 @@ class _EditProductPageState extends State<EditProductPage> {
         centerTitle: true,
         titleTextStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
         title: Text(
-          'Dodaj produkt',
+          'Edytuj produkt',
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
       ),
@@ -289,6 +289,21 @@ class _EditProductPageState extends State<EditProductPage> {
                             style: ListTileStyle.drawer,
                             title: Text(compList[index].producer!),
                             subtitle: Text(compList[index].model!),
+                            onTap: () async {
+                              final item = await createCompatibleItemDialog(
+                                context,
+                                initalProducer: compList[index].producer,
+                                initialModel: compList[index].model,
+                              );
+                              if (item != null) {
+                                setState(() {
+                                  List<Compatible> temp = List.from(compList);
+                                  temp[index] = item;
+                                  compList.clear();
+                                  compList.addAll(temp);
+                                });
+                              }
+                            },
                             trailing: IconButton(
                               onPressed:
                                   () => setState(() {
@@ -323,6 +338,14 @@ class _EditProductPageState extends State<EditProductPage> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
+                        compList.sort((a, b) {
+                          final prod = a.producer!.compareTo(b.producer!);
+                          if (prod != 0) {
+                            return prod;
+                          } else {
+                            return a.model!.compareTo(b.model!);
+                          }
+                        });
                         if (nameCtrl.text.isNotEmpty) {
                           final newProduct =
                               Product()

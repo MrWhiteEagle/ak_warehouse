@@ -1,9 +1,17 @@
 import 'package:ak_warehouse/database/product.dart';
 import 'package:flutter/material.dart';
 
-Future<Compatible?> createCompatibleItemDialog(BuildContext context) {
+Future<Compatible?> createCompatibleItemDialog(
+  BuildContext context, {
+  String? initalProducer,
+  String? initialModel,
+}) {
   final prodCtrl = TextEditingController();
   final modelCtrl = TextEditingController();
+  if (initalProducer != null && initialModel != null) {
+    prodCtrl.text = initalProducer;
+    modelCtrl.text = initialModel;
+  }
   return showDialog<Compatible>(
     context: context,
     builder:

@@ -24,12 +24,16 @@ class _SellPageState extends State<SellPage> {
   void initState() {
     super.initState();
     if (widget.initialP != null) {
-      finalSellMap[widget.initialP!] = 1;
+      if (widget.initialP!.count > 0) {
+        finalSellMap[widget.initialP!] = 1;
+      } else {
+        debugPrint('PRODUCT WH STATE IS 0');
+      }
       debugPrint('GOT PRODUCT - SELLPAGE');
     }
-    Provider.of<ProductDatabase>(context, listen: false).fetchAllProducts();
+    Provider.of<ProductDatabase>(context, listen: false).searchSellProducts();
     sellItemsList.addAll(
-      Provider.of<ProductDatabase>(context, listen: false).fetchedProducts,
+      Provider.of<ProductDatabase>(context, listen: false).sellSearch,
     );
   }
 
@@ -63,9 +67,9 @@ class _SellPageState extends State<SellPage> {
                         Provider.of<ProductDatabase>(
                           context,
                           listen: false,
-                        ).fetchedProducts,
+                        ).sellSearch,
                       );
-                      if (item != null) {
+                      if (item != null && item.count > 0) {
                         setState(() {
                           finalSellMap[item] = 1;
                         });

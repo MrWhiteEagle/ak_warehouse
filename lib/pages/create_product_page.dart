@@ -278,6 +278,21 @@ class _CreateProductPageState extends State<CreateProductPage> {
                             style: ListTileStyle.drawer,
                             title: Text(compList[index].producer!),
                             subtitle: Text(compList[index].model!),
+                            onTap: () async {
+                              final item = await createCompatibleItemDialog(
+                                context,
+                                initalProducer: compList[index].producer,
+                                initialModel: compList[index].model,
+                              );
+                              if (item != null) {
+                                setState(() {
+                                  List<Compatible> temp = List.from(compList);
+                                  temp[index] = item;
+                                  compList.clear();
+                                  compList.addAll(temp);
+                                });
+                              }
+                            },
                             trailing: IconButton(
                               onPressed: () {
                                 setState(() {
@@ -313,7 +328,18 @@ class _CreateProductPageState extends State<CreateProductPage> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
+                        compList.sort((a, b) {
+                          final prod = a.producer!.compareTo(b.producer!);
+                          if (prod != 0) {
+                            return prod;
+                          } else {
+                            return a.model!.compareTo(b.model!);
+                          }
+                        });
                         if (nameCtrl.text.isNotEmpty) {
+                          if (countCtrl.text.isEmpty) {
+                            countCtrl.text = '0';
+                          }
                           final newProduct =
                               Product()
                                 ..name = nameCtrl.text

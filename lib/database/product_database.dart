@@ -61,6 +61,7 @@ class ProductDatabase extends ChangeNotifier {
     debugPrint('[ISAR] Fetched ${products.length} total products!');
     fetchedProducts.clear();
     fetchedProducts.addAll(products);
+    fetchedProducts.sort((a, b) => a.name.compareTo(b.name));
     notifyListeners();
   }
 
@@ -82,10 +83,18 @@ class ProductDatabase extends ChangeNotifier {
                     .or()
                     .descriptionContains(query, caseSensitive: false)
                     .or()
-                    .modelContains(query, caseSensitive: false),
+                    .modelContains(query, caseSensitive: false)
+                    .or()
+                    .compatibleListElement(
+                      (comp) => comp
+                          .modelContains(query, caseSensitive: false)
+                          .or()
+                          .producerContains(query, caseSensitive: false),
+                    ),
               )
               .findAll();
       debugPrint('[ISAR] Found ${products.length} products by query search!');
+      products.sort((a, b) => a.count.compareTo(b.count));
       searchedProducts.clear();
       searchedProducts.addAll(products);
     }
@@ -93,30 +102,18 @@ class ProductDatabase extends ChangeNotifier {
   }
 
   //search function for sellpage
-  Future<void> searchSellProducts(String query) async {
-    if (query.isEmpty) {
-      final products = await isarService.isar.products.where().findAll();
-      debugPrint('[ISAR] Found ${products.length} total products!');
-      sellSearch.clear();
-      sellSearch.addAll(products);
-      notifyListeners();
-    } else {
-      final products =
-          await isarService.isar.products
-              .filter()
-              .group(
-                (q) => q
-                    .nameContains(query, caseSensitive: false)
-                    .or()
-                    .descriptionContains(query, caseSensitive: false)
-                    .or()
-                    .modelContains(query, caseSensitive: false),
-              )
-              .findAll();
-      debugPrint('[ISAR] Found ${products.length} products by query search!');
-      sellSearch.clear();
-      sellSearch.addAll(products);
-    }
+  Future<void> searchSellProducts() async {
+    final products =
+        await isarService.isar.products
+            .filter()
+            .group((q) => q.countGreaterThan(0))
+            .findAll();
+    debugPrint(
+      '[ISAR] Found ${products.length} products with wh state greater than 0!',
+    );
+    sellSearch.clear();
+    sellSearch.addAll(products);
+
     notifyListeners();
   }
 
