@@ -16,6 +16,4 @@ class Product {
 class Compatible {
   String? producer;
   String? model;
-  String? get fullInfo => "$producer $model";
-  String? get fullInfo2 => "$model $producer";
 }
