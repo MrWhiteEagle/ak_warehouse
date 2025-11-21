@@ -11,26 +11,26 @@ class ProductAnimatedContainerTile extends StatelessWidget {
     required this.expandedIndexes,
     required this.tileHeight,
     required this.expandedContentControl,
-    required this.index,
-    this.db,
+    required this.product,
+    required this.db,
   });
 
-  final List<int> expandedIndexes;
+  final List<Product> expandedIndexes;
   final double tileHeight;
-  final List<int> expandedContentControl;
-  final index;
-  final db;
+  final List<Product> expandedContentControl;
+  final Product product;
+  final ProductDatabase db;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
       height:
-          expandedIndexes.contains(index)
+          expandedIndexes.contains(product)
               ? calculateExpandedHeight(
                 tileHeight,
-                db.fetchedProducts[index].description,
+                product.description,
                 convertCompatibleToString(
-                  db.fetchedProducts[index].compatibleList,
+                  product.compatibleList,
                 ),
               )
               : tileHeight,
@@ -59,7 +59,7 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      db.fetchedProducts[index].name,
+                      product.name,
                       style: TextStyle(
                         color: Color.lerp(
                           Theme.of(context).colorScheme.primary,
@@ -71,7 +71,7 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      db.fetchedProducts[index].model,
+                      product.model,
                       style: TextStyle(
                         color: Color.lerp(
                           Theme.of(context).colorScheme.primary,
@@ -100,7 +100,7 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    db.fetchedProducts[index].count.toString(),
+                    product.count.toString(),
                     style: TextStyle(
                       color: Color.lerp(
                         Theme.of(context).colorScheme.primary,
@@ -122,7 +122,7 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                             MaterialPageRoute(
                               builder:
                                   (context) => EditProductPage(
-                                    product: db.fetchedProducts[index],
+                                    product: product,
                                   ),
                             ),
                           )
@@ -131,7 +131,7 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                                 Provider.of<ProductDatabase>(
                                   context,
                                   listen: false,
-                                ).fetchAllProducts(),
+                                ).searchProducts(""),
                           );
                     },
                     label: Text('Edytuj'),
@@ -143,13 +143,13 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                     onPressed:
                         () => areYouSureDialog(
                           context,
-                          db.fetchedProducts[index].id,
+                          product.id,
                         ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Icon(
-                      expandedIndexes.contains(index)
+                      expandedIndexes.contains(product)
                           ? Icons.expand_less
                           : Icons.expand_more,
                       color: Theme.of(context).colorScheme.primary,
@@ -161,8 +161,8 @@ class ProductAnimatedContainerTile extends StatelessWidget {
             ],
           ),
           SizedBox(height: 10),
-          if (expandedIndexes.contains(index) &&
-              expandedContentControl.contains(index))
+          if (expandedIndexes.contains(product) &&
+              expandedContentControl.contains(product))
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
@@ -185,7 +185,7 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                           style: TextStyle(height: 1, fontSize: 14),
                         ),
                         Text(
-                          db.fetchedProducts[index].description,
+                          product.description,
                           style: TextStyle(height: 1, fontSize: 14),
                         ),
                       ],
@@ -201,7 +201,7 @@ class ProductAnimatedContainerTile extends StatelessWidget {
                         ),
                         Text(
                           convertCompatibleToString(
-                            db.fetchedProducts[index].compatibleList,
+                            product.compatibleList,
                           ).join('\n'),
                           style: TextStyle(height: 1, fontSize: 14),
                         ),
@@ -402,9 +402,9 @@ class ProductAnimatedContainerTileCatalogue extends StatelessWidget {
 
 List<String> convertCompatibleToString(List<Compatible> list) {
   final List<String> output = [];
-  list.forEach((compatible) {
+  for (var compatible in list) {
     output.add('${compatible.producer} ${compatible.model}');
-  });
+  }
   return output;
 }
 
@@ -416,7 +416,9 @@ double calculateExpandedHeight(
   int descLines = 1;
   int compLines = 1;
   double lineHeight = 16;
-  compatible.forEach((item) => compLines += 1);
+  for (var item in compatible) {
+    compLines += 1;
+  }
   descLines = desc.split('\n').length;
   if (descLines > compLines) {
     return lineHeight * descLines + baseHeight + 30;

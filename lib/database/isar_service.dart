@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:ak_warehouse/database/product.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
-import 'package:path_provider/path_provider.dart';
 
 class IsarService {
   static final IsarService instance = IsarService.internal();

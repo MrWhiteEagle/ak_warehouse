@@ -152,7 +152,7 @@ Widget? actionButton(index, context) {
                 Provider.of<ProductDatabase>(
                   context,
                   listen: false,
-                ).fetchAllProducts(),
+                ).searchProducts(""),
           );
         },
         tooltip: 'Dodaj produkt',

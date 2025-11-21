@@ -149,14 +149,14 @@ class _SellPageState extends State<SellPage> {
                     newProduct.count -= value;
                     buffer.add(newProduct);
                   });
-                  buffer.forEach((product) {
+                  for (var product in buffer) {
                     updateBuffer.add(
                       Provider.of<ProductDatabase>(
                         context,
                         listen: false,
                       ).updateProduct(product),
                     );
-                  });
+                  }
                   await LoadingDialog.show(context, updateBuffer);
                   setState(() {
                     finalSellMap.clear();

@@ -1,6 +1,7 @@
 import 'package:ak_warehouse/database/product.dart';
 import 'package:ak_warehouse/database/product_database.dart';
 import 'package:ak_warehouse/widgets/catalogue_search_bar.dart';
+import 'package:ak_warehouse/widgets/db_sort_output.dart';
 import 'package:ak_warehouse/widgets/product_animated_container_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,13 +23,18 @@ class _CatalogueState extends State<Catalogue> {
   List<Product> expandedContentControl = [];
   double tileHeight = 80;
 
+  SortBy sortBy = SortBy.name;
+  SortOrder sortOrder = SortOrder.asc;
+  String searchQuery = "";
+
+
   @override
   void initState() {
     super.initState();
     Provider.of<ProductDatabase>(
       context,
       listen: false,
-    ).searchProducts(searchController.text);
+    ).searchProducts(searchController.text, sortBy: sortBy, sortOrder: sortOrder);
   }
 
   @override
@@ -65,13 +71,22 @@ class _CatalogueState extends State<Catalogue> {
               ],
             ),
           ),
+          Container(
+            padding: EdgeInsets.all(8.0),
+            child: DbSortOutput(context: context, sortCallback: ( SortBy sortBy, SortOrder order){
+              this.sortBy = sortBy;
+              sortOrder = order;
+              searchDB(context, searchQuery, this.sortBy, sortOrder);
+            })
+
+          ),
           CatalogueSearchBar(
             searchController: searchController,
             querySearchCallback: (query) async {
-              await Provider.of<ProductDatabase>(
-                context,
-                listen: false,
-              ).searchProducts(query);
+              setState(() {
+                searchQuery = query;
+              });
+              searchDB(context, searchQuery, sortBy, sortOrder);
             },
           ),
           SizedBox(height: 10),
@@ -129,5 +144,9 @@ class _CatalogueState extends State<Catalogue> {
         ],
       ),
     );
+  }
+
+  void searchDB(BuildContext context, String query, SortBy sortBy, SortOrder order) async {
+      await Provider.of<ProductDatabase>(context, listen: false).searchProducts(query, sortBy: sortBy, sortOrder: order);
   }
 }
